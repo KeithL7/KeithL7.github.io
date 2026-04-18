@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>派单交接平台 V1.2</title>
+<style>
+:root{--bg:#f7f6f3;--sf:#fff;--b:rgba(0,0,0,.09);--bm:rgba(0,0,0,.16);--tx:#1a1918;--t2:#6b6966;--t3:#a09d9a;--tl:#0f7a5a;--tlb:#e3f5ee;--bl:#1a5fa8;--blb:#e8f0fb;--am:#8a5a00;--amb:#fdf0d5;--rd:#9b2424;--rdb:#fdeaea;--pu:#5040a8;--pub:#eeedfc;--gb:#f0ede8;--gn:#1a6b2a;--gnb:#e6f5e9;--r:10px;--rs:6px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue',sans-serif;background:var(--bg);color:var(--tx);font-size:14px;line-height:1.5}
+.app{display:flex;height:100vh;overflow:hidden}
+.sb{width:220px;background:var(--sf);border-right:1px solid var(--b);display:flex;flex-direction:column;flex-shrink:0}
+.main{flex:1;overflow-y:auto}
+.brand{padding:18px 16px 12px;border-bottom:1px solid var(--b)}
+.brand-n{font-size:15px;font-weight:600}.brand-s{font-size:11px;color:var(--t3);margin-top:2px}
+.ns{padding:10px 8px 4px}.nl{font-size:10px;font-weight:600;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;padding:0 8px;margin-bottom:3px}
+.ni{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--rs);cursor:pointer;color:var(--t2);font-size:13px;transition:all .12s;margin-bottom:1px;user-select:none}
+.ni:hover{background:var(--gb);color:var(--tx)}.ni.on{background:var(--tx);color:#fff}
+.nicon{font-size:14px;width:18px;text-align:center;flex-shrink:0}
+.nbadge{margin-left:auto;font-size:10px;background:var(--rdb);color:var(--rd);padding:1px 6px;border-radius:10px;font-weight:700;display:none}
+.ni.on .nbadge{background:rgba(255,255,255,.25);color:#fff}
+.sfooter{margin-top:auto;padding:12px 8px;border-top:1px solid var(--b)}
+.urow{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--rs)}
+.av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+.avbl{background:var(--blb);color:var(--bl)}.avtl{background:var(--tlb);color:var(--tl)}.avam{background:var(--amb);color:var(--am)}.avrd{background:var(--rdb);color:var(--rd)}.avpu{background:var(--pub);color:var(--pu)}
+.pg{display:none;padding:26px 30px;max-width:1160px}.pg.on{display:block}
+.pgh{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.pgt{font-size:20px;font-weight:600}.pgs{font-size:13px;color:var(--t2);margin-top:3px}
+.card{background:var(--sf);border-radius:var(--r);border:1px solid var(--b)}.cp{padding:18px 20px}
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.mc{background:var(--sf);border-radius:var(--r);border:1px solid var(--b);padding:16px 18px}
+.mv{font-size:26px;font-weight:700;line-height:1;margin-bottom:5px}.ml{font-size:12px;color:var(--t2)}.md{font-size:11px;margin-top:5px}
+.dup{color:var(--tl)}.ddn{color:var(--rd)}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 14px;border-radius:var(--rs);font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--bm);background:var(--sf);color:var(--tx);font-family:inherit;transition:all .12s;white-space:nowrap}
+.btn:hover{background:var(--gb)}.btn:active{transform:scale(.98)}
+.btnp{background:var(--tx);color:#fff;border-color:var(--tx)}.btnp:hover{opacity:.88;background:var(--tx)}
+.btns{padding:5px 10px;font-size:12px;border-radius:5px}
+.btnd{color:var(--rd);border-color:var(--rdb)}.btnd:hover{background:var(--rdb)}
+.btnt{color:var(--tl);border-color:var(--tlb)}.btnt:hover{background:var(--tlb)}
+.btng{color:var(--gn);border-color:var(--gnb)}.btng:hover{background:var(--gnb)}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500}
+.ttl{background:var(--tlb);color:var(--tl)}.tbl{background:var(--blb);color:var(--bl)}.tam{background:var(--amb);color:var(--am)}.trd{background:var(--rdb);color:var(--rd)}.tgy{background:var(--gb);color:var(--t2)}.tpu{background:var(--pub);color:var(--pu)}.tgn{background:var(--gnb);color:var(--gn)}
+.sp{display:inline-flex;align-items:center;padding:3px 8px;border-radius:20px;font-size:11px;background:var(--blb);color:var(--bl);margin:2px;gap:4px}
+.sp .rm{cursor:pointer;opacity:.6;font-size:12px}.sp .rm:hover{opacity:1}
+.st{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500}
+.st::before{content:'';width:5px;height:5px;border-radius:50%}
+.sid{background:var(--tlb);color:var(--tl)}.sid::before{background:var(--tl)}
+.sbz{background:var(--amb);color:var(--am)}.sbz::before{background:#d4900a}
+.spa{background:var(--gb);color:var(--t2)}.spa::before{background:var(--t3)}
+.spe{background:var(--amb);color:var(--am)}.spe::before{background:#d4900a}
+.sma{background:var(--blb);color:var(--bl)}.sma::before{background:var(--bl)}
+.sip{background:var(--pub);color:var(--pu)}.sip::before{background:var(--pu)}
+.sdn{background:var(--tlb);color:var(--tl)}.sdn::before{background:var(--tl)}
+.scl{background:var(--gb);color:var(--t2)}.scl::before{background:var(--t3)}
+.puu{background:var(--rdb);color:var(--rd)}.puh{background:var(--amb);color:var(--am)}.pum{background:var(--blb);color:var(--bl)}.pul{background:var(--gb);color:var(--t2)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font-size:11px;font-weight:600;text-align:left;padding:10px 14px;border-bottom:1px solid var(--b);color:var(--t2);letter-spacing:.03em;white-space:nowrap}
+td{padding:11px 14px;border-bottom:1px solid var(--b);vertical-align:middle}
+tr:last-child td{border-bottom:none}tr:hover td{background:var(--bg)}
+.fg{margin-bottom:13px}.fl{font-size:12px;font-weight:500;color:var(--t2);margin-bottom:4px;display:block}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:11px}.fr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px}
+input,select,textarea{width:100%;padding:8px 10px;border:1px solid var(--bm);border-radius:var(--rs);font-size:13px;font-family:inherit;background:var(--sf);color:var(--tx);outline:none;transition:border-color .12s}
+input:focus,select:focus,textarea:focus{border-color:#777}
+textarea{min-height:68px;resize:vertical}
+.pfx{display:flex;align-items:center;border:1px solid var(--bm);border-radius:var(--rs);overflow:hidden}
+.pfx span{padding:8px 10px;background:var(--gb);font-size:13px;color:var(--t2);border-right:1px solid var(--bm);white-space:nowrap;flex-shrink:0}
+.pfx input{border:none;border-radius:0;flex:1}
+.siw{display:flex;flex-wrap:wrap;align-items:center;gap:4px;padding:5px 8px;border:1px solid var(--bm);border-radius:var(--rs);min-height:38px;cursor:text}
+.siw input{border:none;padding:0;outline:none;font-size:12px;flex:1;min-width:70px;background:transparent}
+.siw:focus-within{border-color:#777}
+.oc{background:var(--sf);border:1px solid var(--b);border-radius:var(--r);padding:14px 16px;margin-bottom:9px;cursor:pointer;transition:box-shadow .12s,border-color .12s}
+.oc:hover{box-shadow:0 1px 8px rgba(0,0,0,.08);border-color:var(--bm)}
+.oc.sel{border-color:var(--bl);box-shadow:0 0 0 2px rgba(26,95,168,.12)}
+.oh{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:7px}
+.ot{font-size:14px;font-weight:600}.om{font-size:11px;color:var(--t2);margin-top:3px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pb{font-size:13px;font-weight:700;color:var(--gn)}
+.mcr{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--b)}
+.mcr:last-child{border-bottom:none}
+.mbb{flex:1;height:5px;background:var(--gb);border-radius:3px;overflow:hidden}
+.mbf{height:5px;border-radius:3px;background:var(--tl);transition:width .5s}
+.mp{font-size:12px;font-weight:700;color:var(--tl);min-width:36px;text-align:right}
+.li{display:flex;gap:11px;padding-bottom:16px;position:relative}
+.li::before{content:'';position:absolute;left:13px;top:22px;bottom:0;width:1px;background:var(--b)}
+.li:last-child::before{display:none}
+.ld{width:26px;height:26px;border-radius:50%;background:var(--gb);border:2px solid var(--bm);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;z-index:1}
+.ld.done{background:var(--tlb);border-color:var(--tl)}.ld.cur{background:var(--pub);border-color:var(--pu)}
+.lb{flex:1;padding-top:2px}.lt{font-size:13px;font-weight:500}.ltime{font-size:11px;color:var(--t3);margin-top:1px}.ldesc{font-size:12px;color:var(--t2);margin-top:4px;line-height:1.55}
+.mb-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.36);z-index:100;align-items:center;justify-content:center}
+.mb-bg.on{display:flex}
+.modal{background:var(--sf);border-radius:14px;padding:22px;width:540px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.2)}
+.mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.mt{font-size:16px;font-weight:600}
+.mx{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;border:1px solid var(--b);background:transparent;color:var(--t2)}
+.mx:hover{background:var(--gb)}
+.mfr{display:flex;justify-content:flex-end;gap:8px;margin-top:18px;padding-top:14px;border-top:1px solid var(--b)}
+.tbar{display:flex;gap:2px;border-bottom:1px solid var(--b);margin-bottom:18px}
+.ti{padding:9px 14px;font-size:13px;color:var(--t2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .12s}
+.ti:hover{color:var(--tx)}.ti.on{color:var(--tx);border-bottom-color:var(--tx);font-weight:500}
+.tp{display:none}.tp.on{display:block}
+.sr{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--b);font-size:13px}
+.sr:last-child{border-bottom:none}.sl{color:var(--t2)}.sv{font-weight:500}
+.stl{font-size:11px;font-weight:600;color:var(--t2);letter-spacing:.04em;text-transform:uppercase;margin-bottom:9px;margin-top:18px}
+.stl:first-child{margin-top:0}
+.empty{text-align:center;padding:36px 20px;color:var(--t3)}.ei{font-size:28px;margin-bottom:8px}.et{font-size:13px}
+.srbar{display:flex;gap:8px;margin-bottom:14px;align-items:center}
+.srbar input{max-width:220px}
+.prow{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--sf);transition:background .1s}
+.prow:hover{background:var(--bg)}.prow+.prow{border-top:1px solid var(--b)}
+.prow:first-child{border-radius:var(--r) var(--r) 0 0}.prow:last-child{border-radius:0 0 var(--r) var(--r)}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bm);border-radius:3px}
+.toast{position:fixed;bottom:22px;right:22px;background:var(--tx);color:#fff;padding:11px 16px;border-radius:var(--rs);font-size:13px;z-index:9999;opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;max-width:300px;line-height:1.5}
+.toast.on{opacity:1;transform:translateY(0)}
+.ibox{background:var(--blb);border-radius:var(--rs);padding:10px 13px;font-size:12px;color:var(--bl);margin-bottom:12px;line-height:1.5}
+.wbox{background:var(--amb);border-radius:var(--rs);padding:10px 13px;font-size:12px;color:var(--am);margin-bottom:12px;line-height:1.5}
+.sbox{background:var(--tlb);border-radius:var(--rs);padding:10px 13px;font-size:12px;color:var(--tl);margin-bottom:12px;line-height:1.5}
+@media(max-width:760px){.sb{width:56px}.brand-n,.brand-s,.ni span,.urow div{display:none}.ni{justify-content:center;padding:10px}.pg{padding:14px}.g2,.g3,.g4,.g5{grid-template-columns:1fr}.fr,.fr3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="sb">
+  <div class="brand"><div class="brand-n">派单交接平台</div><div class="brand-s">Task Dispatch V1.2</div></div>
+  <div class="ns">
+    <div class="nl">工作台</div>
+    <div class="ni on" id="ni-dash" onclick="goPage('dash')"><span class="nicon">⊞</span><span>总览</span></div>
+    <div class="ni" id="ni-orders" onclick="goPage('orders')"><span class="nicon">☰</span><span>任务管理</span><span class="nbadge" id="nb-orders"></span></div>
+    <div class="ni" id="ni-match" onclick="goPage('match')"><span class="nicon">◎</span><span>智能匹配</span><span class="nbadge" id="nb-match"></span></div>
+    <div class="ni" id="ni-handover" onclick="goPage('handover')"><span class="nicon">⇄</span><span>任务交接</span></div>
+  </div>
+  <div class="ns">
+    <div class="nl">管理</div>
+    <div class="ni" id="ni-people" onclick="goPage('people')"><span class="nicon">◉</span><span>人员管理</span></div>
+    <div class="ni" id="ni-skills" onclick="goPage('skills')"><span class="nicon">◈</span><span>技能标签库</span></div>
+    <div class="ni" id="ni-admin" onclick="goPage('admin')"><span class="nicon">◧</span><span>后台运营</span></div>
+  </div>
+  <div class="sfooter">
+    <div class="urow"><div class="av avbl">管</div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:500">平台管理员</div><div style="font-size:10px;color:var(--t3)">超级管理员</div></div></div>
+  </div>
+</div>
+
+<div class="main">
+
+<div class="pg on" id="pg-dash">
+  <div class="pgh"><div><div class="pgt">工作台总览</div><div class="pgs" id="dash-date"></div></div><button class="btn btnp" onclick="openM('m-order')">＋ 创建任务</button></div>
+  <div class="g5" style="margin-bottom:18px" id="d-metrics"></div>
+  <div class="g2">
+    <div><div class="stl">待处理任务</div><div class="card" id="d-pending"></div></div>
+    <div><div class="stl">最新动态</div><div class="card cp" id="d-activity"></div></div>
+  </div>
+</div>
+
+<div class="pg" id="pg-orders">
+  <div class="pgh"><div><div class="pgt">任务管理</div><div class="pgs">全部派单任务一览</div></div>
+    <div style="display:flex;gap:8px">
+      <select id="of" style="width:120px" onchange="renderOrders()"><option value="">全部状态</option><option value="pending">待匹配</option><option value="matched">已匹配</option><option value="inprog">进行中</option><option value="done">已完成</option></select>
+      <button class="btn btnp" onclick="openM('m-order')">＋ 创建任务</button>
+    </div>
+  </div>
+  <div class="srbar"><input id="osearch" placeholder="搜索任务名称或技能..." oninput="renderOrders()"><span style="font-size:12px;color:var(--t2)" id="ocnt"></span></div>
+  <div id="orders-list"></div>
+</div>
+
+<div class="pg" id="pg-match">
+  <div class="pgh"><div><div class="pgt">智能匹配</div><div class="pgs">选择待匹配任务，系统计算最优执行人</div></div></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <div><div class="stl">待匹配任务</div><div id="match-list"></div></div>
+    <div><div class="stl">匹配候选人</div><div class="card cp" id="match-res"><div class="empty"><div class="ei">◎</div><div class="et">请先选择左侧任务</div></div></div></div>
+  </div>
+</div>
+
+<div class="pg" id="pg-handover">
+  <div class="pgh"><div><div class="pgt">任务交接</div><div class="pgs">进行中任务的交接管理与完整留痕</div></div></div>
+  <div style="display:grid;grid-template-columns:1fr 1.35fr;gap:20px">
+    <div><div class="stl">进行中 / 已匹配任务</div><div id="ho-list"></div></div>
+    <div><div class="stl">任务留痕时间轴</div><div class="card cp" id="ho-log"><div class="empty"><div class="ei">⇄</div><div class="et">点击左侧任务查看留痕</div></div></div></div>
+  </div>
+</div>
+
+<div class="pg" id="pg-people">
+  <div class="pgh"><div><div class="pgt">人员管理</div><div class="pgs">管理平台入驻服务人员</div></div><button class="btn btnp" onclick="openM('m-person')">＋ 添加人员</button></div>
+  <div class="srbar"><input id="psearch" placeholder="搜索姓名、岗位或技能..." oninput="renderPeople()"><span style="font-size:12px;color:var(--t2)" id="pcnt"></span></div>
+  <div style="display:grid;grid-template-columns:1fr 280px;gap:18px">
+    <div><div class="card" id="p-list" style="overflow:hidden"></div></div>
+    <div><div class="stl">技能分布热度</div><div class="card cp" id="skill-dist"></div></div>
+  </div>
+</div>
+
+<div class="pg" id="pg-skills">
+  <div class="pgh"><div><div class="pgt">技能标签库</div><div class="pgs">维护平台技能分类体系</div></div><button class="btn btnp" onclick="openM('m-skill')">＋ 新增标签</button></div>
+  <div style="display:grid;grid-template-columns:190px 1fr;gap:18px">
+    <div><div class="stl">分类</div><div class="card" id="sk-cats"></div></div>
+    <div><div class="stl">标签列表</div><div class="card" id="sk-table"></div></div>
+  </div>
+</div>
+
+<div class="pg" id="pg-admin">
+  <div class="pgh"><div><div class="pgt">后台运营管理</div><div class="pgs">数据监控 · 财务结算 · 风控</div></div></div>
+  <div class="tbar" id="atbar">
+    <div class="ti on" onclick="switchATab('overview',this)">数据概览</div>
+    <div class="ti" onclick="switchATab('finance',this)">财务统计</div>
+    <div class="ti" onclick="switchATab('risk',this)">风控记录</div>
+    <div class="ti" onclick="switchATab('roles',this)">权限管理</div>
+  </div>
+  <div id="at-overview" class="tp on"></div>
+  <div id="at-finance" class="tp"></div>
+  <div id="at-risk" class="tp"></div>
+  <div id="at-roles" class="tp"></div>
+</div>
+
+</div>
+</div>
+
+<!-- New Order Modal -->
+<div class="mb-bg" id="m-order">
+  <div class="modal">
+    <div class="mh"><div class="mt">创建新任务</div><button class="mx" onclick="closeM('m-order')">✕</button></div>
+    <div class="fg"><label class="fl">任务标题 *</label><input id="o-title" placeholder="简明描述任务内容"></div>
+    <div class="fg"><label class="fl">任务描述</label><textarea id="o-desc" placeholder="详细说明任务要求和验收标准..."></textarea></div>
+    <div class="fr3">
+      <div class="fg"><label class="fl">优先级</label><select id="o-pri"><option value="urgent">紧急</option><option value="high">高</option><option value="mid" selected>中</option><option value="low">低</option></select></div>
+      <div class="fg"><label class="fl">截止日期</label><input type="date" id="o-dl"></div>
+      <div class="fg"><label class="fl">计价方式</label><select id="o-pt" onchange="updPriceLabel()"><option value="fixed">固定总价</option><option value="daily">日薪</option><option value="hourly">时薪</option></select></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl" id="o-pl">预算金额（元）</label><div class="pfx"><span>¥</span><input type="number" id="o-price" placeholder="0" min="0" oninput="updPricePreview()"></div></div>
+      <div class="fg"><label class="fl">平台服务费率（%）</label><div class="pfx"><span>%</span><input type="number" id="o-comm" value="5" min="0" max="50" oninput="updPricePreview()"></div></div>
+    </div>
+    <div id="o-prev" style="margin-bottom:12px;display:none"></div>
+    <div class="fg"><label class="fl">所需技能（回车添加）</label>
+      <div class="siw" id="o-sw" onclick="document.getElementById('o-si').focus()"><input id="o-si" placeholder="输入技能名称..." onkeydown="addTag(event,'o-si','osa','o-sw')"></div>
+    </div>
+    <div class="fg"><label class="fl">任务地点（留空为远程）</label><input id="o-loc" placeholder="如：上海市浦东新区"></div>
+    <div class="mfr"><button class="btn" onclick="closeM('m-order')">取消</button><button class="btn btnp" onclick="submitOrder()">创建任务</button></div>
+  </div>
+</div>
+
+<!-- New Person Modal -->
+<div class="mb-bg" id="m-person">
+  <div class="modal">
+    <div class="mh"><div class="mt">添加人员</div><button class="mx" onclick="closeM('m-person')">✕</button></div>
+    <div class="fr">
+      <div class="fg"><label class="fl">姓名 *</label><input id="p-name" placeholder="真实姓名"></div>
+      <div class="fg"><label class="fl">岗位</label><input id="p-role" placeholder="如：前端工程师"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">联系方式</label><input id="p-contact" placeholder="手机号"></div>
+      <div class="fg"><label class="fl">所在区域</label><input id="p-area" placeholder="如：上海市"></div>
+    </div>
+    <div class="fg"><label class="fl">技能标签（回车添加）</label>
+      <div class="siw" id="p-sw" onclick="document.getElementById('p-si').focus()"><input id="p-si" placeholder="输入技能..." onkeydown="addTag(event,'p-si','psa','p-sw')"></div>
+    </div>
+    <div class="fr3">
+      <div class="fg"><label class="fl">接单状态</label><select id="p-avail"><option value="idle">空闲</option><option value="busy">忙碌</option><option value="pause">暂停接单</option></select></div>
+      <div class="fg"><label class="fl">工作年限</label><input type="number" id="p-years" placeholder="3" min="0" max="50"></div>
+      <div class="fg"><label class="fl">期望日薪（元）</label><div class="pfx"><span>¥</span><input type="number" id="p-rate" placeholder="800" min="0"></div></div>
+    </div>
+    <div class="mfr"><button class="btn" onclick="closeM('m-person')">取消</button><button class="btn btnp" onclick="submitPerson()">添加人员</button></div>
+  </div>
+</div>
+
+<!-- New Skill Modal -->
+<div class="mb-bg" id="m-skill">
+  <div class="modal" style="width:400px">
+    <div class="mh"><div class="mt">新增技能标签</div><button class="mx" onclick="closeM('m-skill')">✕</button></div>
+    <div class="fg"><label class="fl">标签名称 *</label><input id="sk-n" placeholder="如：Vue.js"></div>
+    <div class="fg"><label class="fl">所属分类</label><select id="sk-c"><option>前端开发</option><option>后端开发</option><option>移动开发</option><option>设计</option><option>运维</option><option>数据</option><option>测试</option><option>管理</option><option>其他</option></select></div>
+    <div class="fg"><label class="fl">同义词（逗号分隔）</label><input id="sk-a" placeholder="如：Vue, Vue3"></div>
+    <div class="mfr"><button class="btn" onclick="closeM('m-skill')">取消</button><button class="btn btnp" onclick="submitSkill()">添加</button></div>
+  </div>
+</div>
+
+<!-- Order Detail Modal -->
+<div class="mb-bg" id="m-detail">
+  <div class="modal" style="width:600px">
+    <div class="mh"><div class="mt" id="det-title">任务详情</div><button class="mx" onclick="closeM('m-detail')">✕</button></div>
+    <div id="det-body"></div>
+    <div class="mfr" id="det-footer"></div>
+  </div>
+</div>
+
+<!-- Handover Modal -->
+<div class="mb-bg" id="m-ho">
+  <div class="modal" style="width:480px">
+    <div class="mh"><div class="mt">发起任务交接</div><button class="mx" onclick="closeM('m-ho')">✕</button></div>
+    <div id="ho-info" style="margin-bottom:14px"></div>
+    <div class="fg"><label class="fl">交接原因 *</label><select id="ho-reason"><option value="请假">人员请假</option><option value="技能不足">技能不足</option><option value="客户要求">客户指定更换</option><option value="其他">其他原因</option></select></div>
+    <div class="fg"><label class="fl">当前进展说明</label><textarea id="ho-prog" placeholder="描述目前任务完成情况，便于接手人快速上手..."></textarea></div>
+    <div class="fg"><label class="fl">指定接收人（留空则系统自动匹配）</label><select id="ho-to"><option value="">系统自动匹配</option></select></div>
+    <div class="mfr"><button class="btn" onclick="closeM('m-ho')">取消</button><button class="btn btnp" onclick="submitHo()">确认交接</button></div>
+  </div>
+</div>
+
+<!-- Complete Modal -->
+<div class="mb-bg" id="m-done">
+  <div class="modal" style="width:460px">
+    <div class="mh"><div class="mt">提交任务完成</div><button class="mx" onclick="closeM('m-done')">✕</button></div>
+    <div id="done-info" style="margin-bottom:14px"></div>
+    <div class="fg"><label class="fl">完成说明 *</label><textarea id="done-desc" placeholder="描述完成内容、交付成果..."></textarea></div>
+    <div class="fg"><label class="fl">客户验收评分</label>
+      <select id="done-rating"><option value="5">⭐⭐⭐⭐⭐ 非常满意（5分）</option><option value="4">⭐⭐⭐⭐ 满意（4分）</option><option value="3">⭐⭐⭐ 一般（3分）</option><option value="2">⭐⭐ 不满意（2分）</option><option value="1">⭐ 很差（1分）</option></select>
+    </div>
+    <div class="mfr"><button class="btn" onclick="closeM('m-done')">取消</button><button class="btn btnp" onclick="submitDone()">确认完成并结算</button></div>
+  </div>
+</div>
+
+<!-- Progress Modal -->
+<div class="mb-bg" id="m-prog">
+  <div class="modal" style="width:440px">
+    <div class="mh"><div class="mt">提交任务进展</div><button class="mx" onclick="closeM('m-prog')">✕</button></div>
+    <div id="prog-info" style="margin-bottom:12px"></div>
+    <div class="fg"><label class="fl">进展说明 *</label><textarea id="prog-desc" placeholder="描述当前完成情况、遇到问题或下一步计划..."></textarea></div>
+    <div class="mfr"><button class="btn" onclick="closeM('m-prog')">取消</button><button class="btn btnp" onclick="submitProg()">提交进展</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const AVC=['avbl','avtl','avam','avrd','avpu'];
+let nPid=100,nOid=100,nLid=1000;
+let curPage='dash',curATab='overview',selMatch=null,selHo=null,selSkCat=null,doneOid=null,progOid=null,hoOid=null;
+let tags={osa:[],psa:[]};
+
+let people=[
+  {id:1,name:'李小明',role:'前端工程师',contact:'138-0001-1111',area:'上海市',avail:'busy',skills:['Vue.js','React','TypeScript','CSS'],years:4,rating:4.8,orders:23,cert:true,rate:1200,earn:0},
+  {id:2,name:'王芳',role:'后端工程师',contact:'138-0002-2222',area:'上海市',avail:'idle',skills:['Python','Django','MySQL','Redis'],years:5,rating:4.7,orders:31,cert:true,rate:1000,earn:0},
+  {id:3,name:'陈伟',role:'全栈工程师',contact:'138-0003-3333',area:'北京市',avail:'busy',skills:['React','Node.js','MongoDB','Docker'],years:6,rating:4.9,orders:47,cert:true,rate:1500,earn:0},
+  {id:4,name:'赵丽',role:'UI/UX设计师',contact:'138-0004-4444',area:'上海市',avail:'idle',skills:['Figma','Photoshop','Illustrator','原型设计'],years:3,rating:4.6,orders:18,cert:false,rate:800,earn:0},
+  {id:5,name:'刘杰',role:'运维工程师',contact:'138-0005-5555',area:'深圳市',avail:'idle',skills:['Docker','Kubernetes','Linux','Nginx'],years:5,rating:4.8,orders:29,cert:true,rate:1100,earn:14250},
+  {id:6,name:'张敏',role:'数据分析师',contact:'138-0006-6666',area:'上海市',avail:'pause',skills:['Python','SQL','Tableau','数据可视化'],years:4,rating:4.5,orders:15,cert:false,rate:900,earn:0},
+];
+
+let orders=[
+  {id:1,title:'电商平台首页重构',desc:'对现有首页进行UI升级和前端性能优化，要求支持移动端适配',pri:'high',dl:'2025-06-10',skills:['React','CSS','TypeScript'],loc:'远程',status:'inprog',ass:1,price:8000,pt:'fixed',comm:5,created:'2025-05-01 09:00',logs:[
+    {id:1,t:'create',by:'管理员',time:'2025-05-01 09:00',desc:'任务创建，预算 ¥8,000（固定总价），服务费 5%，执行人实得 ¥7,600'},
+    {id:2,t:'match',by:'系统',time:'2025-05-01 09:02',desc:'推荐 Top3：李小明(92%)、陈伟(78%)、王芳(34%)'},
+    {id:3,t:'assign',by:'管理员',time:'2025-05-01 09:15',desc:'派单给 李小明'},
+    {id:4,t:'accept',by:'李小明',time:'2025-05-01 09:18',desc:'接单确认，响应 3分钟'},
+    {id:5,t:'start',by:'李小明',time:'2025-05-01 10:00',desc:'开始执行任务'},
+    {id:6,t:'progress',by:'李小明',time:'2025-05-03 18:00',desc:'首页框架搭建完成，正在开发商品列表模块'},
+  ]},
+  {id:2,title:'用户行为数据分析系统',desc:'构建用户行为埋点与分析后台，设计数据模型和可视化报表',pri:'mid',dl:'2025-06-20',skills:['Python','MySQL','数据可视化'],loc:'远程',status:'pending',ass:null,price:12000,pt:'fixed',comm:5,created:'2025-05-02 14:00',logs:[
+    {id:1,t:'create',by:'管理员',time:'2025-05-02 14:00',desc:'任务创建，预算 ¥12,000，等待匹配'},
+  ]},
+  {id:3,title:'移动端App设计稿',desc:'为新版App设计完整UI设计稿，包含首页、详情页、个人中心等10+页面',pri:'high',dl:'2025-05-28',skills:['Figma','原型设计'],loc:'远程',status:'matched',ass:4,price:6000,pt:'fixed',comm:5,created:'2025-05-01 11:00',logs:[
+    {id:1,t:'create',by:'管理员',time:'2025-05-01 11:00',desc:'任务创建，预算 ¥6,000，执行人实得 ¥5,700'},
+    {id:2,t:'match',by:'系统',time:'2025-05-01 11:01',desc:'推荐 Top2：赵丽(95%)、张敏(20%)'},
+    {id:3,t:'assign',by:'管理员',time:'2025-05-01 11:20',desc:'派单给 赵丽'},
+    {id:4,t:'accept',by:'赵丽',time:'2025-05-01 11:35',desc:'接单确认，响应 15分钟'},
+  ]},
+  {id:4,title:'服务器集群扩容与优化',desc:'对生产环境K8s集群进行扩容，优化资源调度策略',pri:'urgent',dl:'2025-05-20',skills:['Kubernetes','Docker','Linux'],loc:'上海市',status:'done',ass:5,price:15000,pt:'fixed',comm:5,created:'2025-04-28 09:00',logs:[
+    {id:1,t:'create',by:'管理员',time:'2025-04-28 09:00',desc:'任务创建，预算 ¥15,000（紧急），执行人实得 ¥14,250'},
+    {id:2,t:'assign',by:'管理员',time:'2025-04-28 09:05',desc:'直接派单给 刘杰'},
+    {id:3,t:'accept',by:'刘杰',time:'2025-04-28 09:07',desc:'接单确认，响应 2分钟'},
+    {id:4,t:'start',by:'刘杰',time:'2025-04-28 09:30',desc:'开始现场作业'},
+    {id:5,t:'complete',by:'刘杰',time:'2025-04-30 17:00',desc:'扩容完成，集群稳定运行，提交验收'},
+    {id:6,t:'verify',by:'管理员',time:'2025-04-30 18:00',desc:'验收通过 ⭐⭐⭐⭐⭐ 5.0分 · 结算 ¥14,250（服务费 ¥750）'},
+  ]},
+  {id:5,title:'后台管理系统API开发',desc:'开发后台RESTful API，包含用户管理、权限控制、日志审计',pri:'mid',dl:'2025-07-01',skills:['Node.js','MySQL','Docker'],loc:'远程',status:'inprog',ass:3,price:20000,pt:'fixed',comm:5,created:'2025-05-03 10:00',logs:[
+    {id:1,t:'create',by:'管理员',time:'2025-05-03 10:00',desc:'任务创建，预算 ¥20,000，执行人实得 ¥19,000'},
+    {id:2,t:'assign',by:'管理员',time:'2025-05-03 10:10',desc:'派单给 陈伟'},
+    {id:3,t:'accept',by:'陈伟',time:'2025-05-03 10:12',desc:'接单确认'},
+    {id:4,t:'start',by:'陈伟',time:'2025-05-04 09:00',desc:'开始开发'},
+  ]},
+];
+
+let skills=[
+  {id:1,n:'Vue.js',cat:'前端开发',alias:['Vue','Vue3'],cnt:1},{id:2,n:'React',cat:'前端开发',alias:['React.js'],cnt:2},
+  {id:3,n:'TypeScript',cat:'前端开发',alias:['TS'],cnt:1},{id:4,n:'CSS',cat:'前端开发',alias:['CSS3'],cnt:1},
+  {id:5,n:'Python',cat:'后端开发',alias:[],cnt:2},{id:6,n:'Django',cat:'后端开发',alias:[],cnt:1},
+  {id:7,n:'Node.js',cat:'后端开发',alias:['Node'],cnt:1},{id:8,n:'MySQL',cat:'后端开发',alias:['SQL'],cnt:2},
+  {id:9,n:'Redis',cat:'后端开发',alias:[],cnt:1},{id:10,n:'MongoDB',cat:'后端开发',alias:[],cnt:1},
+  {id:11,n:'Docker',cat:'运维',alias:[],cnt:2},{id:12,n:'Kubernetes',cat:'运维',alias:['K8s'],cnt:1},
+  {id:13,n:'Linux',cat:'运维',alias:[],cnt:1},{id:14,n:'Nginx',cat:'运维',alias:[],cnt:1},
+  {id:15,n:'Figma',cat:'设计',alias:[],cnt:1},{id:16,n:'Photoshop',cat:'设计',alias:['PS'],cnt:1},
+  {id:17,n:'Illustrator',cat:'设计',alias:['AI'],cnt:1},{id:18,n:'原型设计',cat:'设计',alias:[],cnt:1},
+  {id:19,n:'数据可视化',cat:'数据',alias:[],cnt:1},{id:20,n:'Tableau',cat:'数据',alias:[],cnt:1},
+  {id:21,n:'SQL',cat:'数据',alias:[],cnt:1},
+];
+
+let risks=[
+  {id:1,tp:'warn',who:'张敏',desc:'24小时内拒绝订单3次，触发异常提醒',time:'2025-05-02 16:30',done:false},
+  {id:2,tp:'info',who:'系统',desc:'订单 #2《用户行为数据分析系统》超过24h未匹配',time:'2025-05-03 14:00',done:false},
+];
+
+// utils
+const avc=id=>AVC[id%AVC.length],ini=n=>n.slice(0,2);
+const fm=v=>v?'¥'+Number(v).toLocaleString():'—';
+const now=()=>new Date().toLocaleString('zh-CN',{hour12:false}).replace(/\//g,'-');
+const slb=s=>({pending:'待匹配',matched:'已匹配',inprog:'进行中',done:'已完成',closed:'已关闭'}[s]||s);
+const plb=p=>({urgent:'紧急',high:'高',mid:'中',low:'低'}[p]||p);
+const pcl=p=>({urgent:'puu',high:'puh',mid:'pum',low:'pul'}[p]||'');
+const alb=a=>({idle:'空闲',busy:'忙碌',pause:'暂停'}[a]||a);
+const acl=a=>({idle:'sid',busy:'sbz',pause:'spa'}[a]||'');
+const ptlb=t=>({fixed:'固定总价',daily:'日薪',hourly:'时薪'}[t]||t);
+const lico=t=>({create:'📋',match:'🎯',assign:'📨',accept:'✅',start:'▶',progress:'📝',handover:'🔄',complete:'🏁',verify:'⭐',close:'🔒'}[t]||'•');
+
+function toast(msg,dur=2500){
+  const t=document.getElementById('toast');
+  t.innerHTML=msg;t.classList.add('on');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),dur);
+}
+function openM(id){document.getElementById(id).classList.add('on');}
+function closeM(id){document.getElementById(id).classList.remove('on');}
+
+// FIX #10: global badge update
+function updBadges(){
+  const p=orders.filter(o=>o.status==='pending').length;
+  ['nb-orders','nb-match'].forEach(id=>{const el=document.getElementById(id);el.textContent=p||'';el.style.display=p?'':'none';});
+}
+
+function goPage(name){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
+  document.getElementById('pg-'+name).classList.add('on');
+  document.getElementById('ni-'+name).classList.add('on');
+  curPage=name; updBadges();
+  ({dash:renderDash,orders:renderOrders,match:renderMatch,handover:renderHandover,people:renderPeople,skills:renderSkills,admin:renderAdmin})[name]?.();
+}
+
+function refreshAll(){
+  updBadges();
+  if(curPage==='dash')renderDash();
+  if(curPage==='orders')renderOrders();
+  if(curPage==='handover')renderHandover();
+  if(curPage==='people')renderPeople();
+  if(curPage==='admin')renderAdminTab(curATab);
+}
+
+// tag input
+function addTag(e,inpId,key,wrapId){
+  if((e.key==='Enter'||e.key===',')&&e.target.value.trim()){
+    e.preventDefault();const v=e.target.value.trim().replace(',','');
+    if(!tags[key])tags[key]=[];
+    if(!tags[key].includes(v)){tags[key].push(v);renderTags(key,inpId,wrapId);}
+    e.target.value='';
+  }
+}
+function renderTags(key,inpId,wrapId){
+  const w=document.getElementById(wrapId),inp=document.getElementById(inpId);
+  w.innerHTML='';
+  (tags[key]||[]).forEach((t,i)=>{
+    const s=document.createElement('span');s.className='sp';
+    s.innerHTML=`${t}<span class="rm" onclick="rmTag('${key}',${i},'${inpId}','${wrapId}')">×</span>`;
+    w.appendChild(s);
+  });
+  w.appendChild(inp);
+}
+function rmTag(key,i,inpId,wrapId){tags[key].splice(i,1);renderTags(key,inpId,wrapId);}
+function clearTags(key,wrapId,inpId){
+  tags[key]=[];
+  const w=document.getElementById(wrapId),inp=document.getElementById(inpId);
+  if(w&&inp){w.innerHTML='';inp.value='';w.appendChild(inp);}
+}
+
+// FIX #6: price preview live update
+function updPriceLabel(){
+  const t=document.getElementById('o-pt').value;
+  document.getElementById('o-pl').textContent={fixed:'预算总金额（元）',daily:'日薪（元/天）',hourly:'时薪（元/小时）'}[t];
+  updPricePreview();
+}
+function updPricePreview(){
+  const price=Math.max(0,parseFloat(document.getElementById('o-price').value)||0);
+  const comm=Math.min(50,Math.max(0,parseFloat(document.getElementById('o-comm').value)||5));
+  const prev=document.getElementById('o-prev');
+  if(price>0){
+    const fee=Math.round(price*comm/100),net=price-fee;
+    prev.style.display='block';
+    prev.innerHTML=`<div style="background:var(--gnb);border-radius:6px;padding:10px 12px;display:flex;gap:18px;flex-wrap:wrap;font-size:12px"><span>预算 <b style="color:var(--gn);font-size:14px">${fm(price)}</b></span><span>平台服务费 <b>${fm(fee)}</b>（${comm}%）</span><span>执行人实得 <b style="color:var(--tl)">${fm(net)}</b></span></div>`;
+  } else prev.style.display='none';
+}
+
+// match engine
+function calcMatch(p,o){
+  if(!o.skills.length)return 0;
+  const req=o.skills.map(s=>s.toLowerCase()),has=p.skills.map(s=>s.toLowerCase());
+  const hits=req.filter(r=>has.some(h=>h===r||h.includes(r)||r.includes(h)));
+  const sk=hits.length/req.length,geo=(!o.loc||o.loc==='远程')?1:(p.area===o.loc?1:0.3),rat=(p.rating-1)/4;
+  return Math.round((sk*0.6+geo*0.2+rat*0.15+0.05)*({idle:1,busy:0.5,pause:0}[p.avail]??0)*100);
+}
+
+// dashboard
+function renderDash(){
+  document.getElementById('dash-date').textContent=new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
+  const idle=people.filter(p=>p.avail==='idle').length,pend=orders.filter(o=>o.status==='pending').length;
+  const ip=orders.filter(o=>o.status==='inprog').length,done=orders.filter(o=>o.status==='done');
+  const gmv=done.reduce((s,o)=>s+(o.price||0),0),fee=done.reduce((s,o)=>s+Math.round((o.price||0)*(o.comm||5)/100),0);
+  document.getElementById('d-metrics').innerHTML=`
+    <div class="mc"><div class="mv" style="color:var(--tl)">${people.length}</div><div class="ml">入驻人员</div><div class="md dup">↑ ${idle} 人空闲</div></div>
+    <div class="mc"><div class="mv" style="color:var(--am)">${pend}</div><div class="ml">待匹配任务</div><div class="md ${pend?'ddn':'dup'}">${pend?'需尽快处理':'暂无积压 ✓'}</div></div>
+    <div class="mc"><div class="mv" style="color:var(--pu)">${ip}</div><div class="ml">进行中任务</div><div class="md">正在执行</div></div>
+    <div class="mc"><div class="mv" style="color:var(--t2)">${done.length}</div><div class="ml">已完成任务</div><div class="md dup">累计</div></div>
+    <div class="mc"><div class="mv" style="color:var(--gn);font-size:17px">${fm(gmv)}</div><div class="ml">累计 GMV</div><div class="md dup">服务费 ${fm(fee)}</div></div>
+  `;
+  const po=orders.filter(o=>o.status==='pending'||o.status==='matched');
+  document.getElementById('d-pending').innerHTML=po.length?po.map(o=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--b);cursor:pointer" onclick="showDetail(${o.id})">
+      <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:500">${o.title}</div>
+        <div style="font-size:11px;color:var(--t2);margin-top:3px;display:flex;align-items:center;gap:8px"><span class="pb">${fm(o.price)}</span><span class="tag tgy">${ptlb(o.pt)}</span><span>实得 ${fm(o.price?Math.round(o.price*(1-(o.comm||5)/100)):0)}</span></div>
+      </div><span class="st s${o.status}">${slb(o.status)}</span>
+    </div>`).join('')+'<div style="padding:8px 16px 10px"><button class="btn btns btnt" onclick="goPage(\'match\')">去匹配 →</button></div>':
+    '<div class="empty" style="padding:20px"><div class="et">暂无待处理任务 ✓</div></div>';
+  document.getElementById('d-activity').innerHTML=`
+    <div class="li"><div class="ld done">✓</div><div class="lb"><div class="lt">服务器集群扩容完成</div><div class="ltime">2025-04-30 18:00</div><div class="ldesc">刘杰完成 · 结算 ¥14,250 · 5.0⭐</div></div></div>
+    <div class="li"><div class="ld cur">▶</div><div class="lb"><div class="lt">首页重构任务进展更新</div><div class="ltime">2025-05-03 18:00</div><div class="ldesc">李小明：框架完成，开发中</div></div></div>
+    <div class="li"><div class="ld" style="font-size:10px">⚠</div><div class="lb"><div class="lt">风控：张敏拒单异常</div><div class="ltime">2025-05-02 16:30</div><div class="ldesc">24h内拒绝3次，建议约谈</div></div></div>
+    <div class="li"><div class="ld">+</div><div class="lb"><div class="lt">新任务等待匹配</div><div class="ltime">2025-05-02 14:00</div><div class="ldesc">《用户行为数据分析》预算 ¥12,000</div></div></div>`;
+}
+
+// orders — FIX #2 inline actions, #13 search
+function renderOrders(){
+  const fv=document.getElementById('of')?.value||'';
+  const q=(document.getElementById('osearch')?.value||'').toLowerCase().trim();
+  let list=fv?orders.filter(o=>o.status===fv):orders;
+  if(q)list=list.filter(o=>o.title.toLowerCase().includes(q)||o.skills.some(s=>s.toLowerCase().includes(q)));
+  const cnt=document.getElementById('ocnt');if(cnt)cnt.textContent=list.length?`共 ${list.length} 条`:'';
+  document.getElementById('orders-list').innerHTML=list.length?list.map(o=>{
+    const a=o.ass?people.find(p=>p.id===o.ass):null;
+    const net=o.price?Math.round(o.price*(1-(o.comm||5)/100)):0;
+    const acts=[];
+    if(o.status==='pending')acts.push(`<button class="btn btns btnt" onclick="event.stopPropagation();goPage('match')">去匹配</button>`);
+    if(o.status==='matched')acts.push(`<button class="btn btns btng" onclick="event.stopPropagation();startOrder(${o.id})">▶ 开始执行</button>`);
+    if(o.status==='inprog'){
+      acts.push(`<button class="btn btns" onclick="event.stopPropagation();doProgress(${o.id})">📝 更新进展</button>`);
+      acts.push(`<button class="btn btns" onclick="event.stopPropagation();doHandover(${o.id})">申请交接</button>`);
+      acts.push(`<button class="btn btns btng" onclick="event.stopPropagation();doComplete(${o.id})">✓ 提交完成</button>`);
+    }
+    return `<div class="oc" onclick="showDetail(${o.id})">
+      <div class="oh">
+        <div style="flex:1;min-width:0"><div class="ot">${o.title}</div>
+          <div class="om"><span class="pb">${fm(o.price)}</span><span class="tag tgy">${ptlb(o.pt)}</span><span>实得 <b style="color:var(--tl)">${fm(net)}</b></span><span>截止 ${o.dl||'—'}</span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0"><span class="st s${o.status}">${slb(o.status)}</span><span class="tag ${pcl(o.pri)}">${plb(o.pri)}</span></div>
+      </div>
+      <div>${o.skills.map(s=>`<span class="sp">${s}</span>`).join('')}</div>
+      ${a?`<div style="display:flex;align-items:center;gap:6px;margin-top:7px;font-size:11px;color:var(--t2)"><div class="av ${avc(a.id)}" style="width:16px;height:16px;font-size:7px">${ini(a.name)}</div>执行人：${a.name} · 期望日薪 ${fm(a.rate)} · 服务费 ${o.comm||5}%</div>`:'<div style="font-size:11px;color:var(--t3);margin-top:7px">暂未分配执行人</div>'}
+      ${acts.length?`<div style="display:flex;gap:6px;margin-top:10px">${acts.join('')}</div>`:''}
+    </div>`;
+  }).join(''):'<div class="empty"><div class="ei">☰</div><div class="et">暂无任务</div></div>';
+}
+
+// order detail
+function showDetail(oid){
+  const o=orders.find(x=>x.id===oid);if(!o)return;
+  const a=o.ass?people.find(p=>p.id===o.ass):null;
+  const comm=o.comm||5,net=o.price?Math.round(o.price*(1-comm/100)):0;
+  document.getElementById('det-title').textContent=o.title;
+  document.getElementById('det-body').innerHTML=`
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px">
+      <span class="st s${o.status}">${slb(o.status)}</span>
+      <span class="tag ${pcl(o.pri)}">${plb(o.pri)}优先</span>
+      ${o.loc?`<span class="tag tgy">${o.loc}</span>`:''}
+    </div>
+    <div style="background:var(--gnb);border-radius:8px;padding:12px 16px;margin-bottom:14px;display:flex;gap:20px;flex-wrap:wrap;align-items:center">
+      <div><div style="font-size:10px;color:var(--t2);margin-bottom:2px">任务预算</div><div style="font-size:22px;font-weight:700;color:var(--gn)">${fm(o.price)}</div></div>
+      <div><div style="font-size:10px;color:var(--t2);margin-bottom:2px">计价方式</div><div style="font-size:13px;font-weight:500">${ptlb(o.pt)}</div></div>
+      <div><div style="font-size:10px;color:var(--t2);margin-bottom:2px">平台服务费</div><div style="font-size:13px;font-weight:500">${comm}% · ${fm(o.price?Math.round(o.price*comm/100):0)}</div></div>
+      <div><div style="font-size:10px;color:var(--t2);margin-bottom:2px">执行人实得</div><div style="font-size:16px;font-weight:700;color:var(--tl)">${fm(net)}</div></div>
+    </div>
+    ${o.desc?`<div style="font-size:13px;color:var(--t2);margin-bottom:12px;line-height:1.6">${o.desc}</div>`:''}
+    <div style="margin-bottom:12px"><div style="font-size:10px;font-weight:600;color:var(--t2);margin-bottom:5px;letter-spacing:.04em">所需技能</div>${o.skills.map(s=>`<span class="sp">${s}</span>`).join('')||'<span style="color:var(--t3);font-size:12px">未设置</span>'}</div>
+    ${a?`<div style="margin-bottom:14px"><div style="font-size:10px;font-weight:600;color:var(--t2);margin-bottom:7px;letter-spacing:.04em">当前执行人</div>
+      <div style="display:flex;align-items:center;gap:10px"><div class="av ${avc(a.id)}" style="width:34px;height:34px;font-size:12px">${ini(a.name)}</div>
+      <div><div style="font-size:13px;font-weight:500">${a.name} · ${a.role}</div><div style="font-size:11px;color:var(--t2);margin-top:2px">${a.rating}⭐ · ${a.orders}单 · 期望日薪 ${fm(a.rate)}</div></div></div></div>`:''}
+    <div><div style="font-size:10px;font-weight:600;color:var(--t2);margin-bottom:9px;letter-spacing:.04em">留痕记录（${o.logs.length}条）</div>${renderLogs(o.logs)}</div>
+  `;
+  let btns=`<button class="btn" onclick="closeM('m-detail')">关闭</button>`;
+  if(o.status==='pending')btns+=`<button class="btn btnp" onclick="closeM('m-detail');goPage('match')">去匹配 →</button>`;
+  if(o.status==='matched')btns+=`<button class="btn btng" onclick="startOrder(${o.id})">▶ 开始执行</button>`;
+  if(o.status==='inprog'){
+    btns+=`<button class="btn" onclick="closeM('m-detail');doProgress(${o.id})">📝 更新进展</button>`;
+    btns+=`<button class="btn" onclick="closeM('m-detail');doHandover(${o.id})">申请交接</button>`;
+    btns+=`<button class="btn btnp" onclick="closeM('m-detail');doComplete(${o.id})">✓ 提交完成</button>`;
+  }
+  document.getElementById('det-footer').innerHTML=btns;
+  openM('m-detail');
+}
+
+function renderLogs(logs){
+  return logs.map((l,i)=>`<div class="li"><div class="ld ${i===logs.length-1?'cur':i>=logs.length-2?'done':''}">${lico(l.t)}</div><div class="lb"><div class="lt">${l.by}</div><div class="ltime">${l.time}</div><div class="ldesc">${l.desc}</div></div></div>`).join('');
+}
+
+function startOrder(oid){
+  const o=orders.find(x=>x.id===oid);if(!o)return;
+  o.status='inprog';const a=people.find(p=>p.id===o.ass);
+  o.logs.push({id:nLid++,t:'start',by:a?.name||'执行人',time:now(),desc:'确认开始执行任务'});
+  closeM('m-detail');toast(`▶ 「${o.title}」已开始执行`);refreshAll();
+}
+
+// FIX #3: clear form on submit
+function submitOrder(){
+  const title=document.getElementById('o-title').value.trim();
+  if(!title){toast('⚠ 请输入任务标题');return;}
+  const price=Math.max(0,parseFloat(document.getElementById('o-price').value)||0);
+  const comm=Math.min(50,Math.max(0,parseFloat(document.getElementById('o-comm').value)||5)); // FIX #8
+  const pt=document.getElementById('o-pt').value;
+  const extra=document.getElementById('o-si').value.trim();
+  const skls=[...(tags['osa']||[])];if(extra)skls.push(extra);
+  const net=price?Math.round(price*(1-comm/100)):0,n=now();
+  orders.unshift({id:nOid++,title,desc:document.getElementById('o-desc').value.trim(),pri:document.getElementById('o-pri').value,dl:document.getElementById('o-dl').value,skills:skls,loc:document.getElementById('o-loc').value.trim()||'远程',status:'pending',ass:null,price,pt,comm,created:n,
+    logs:[{id:nLid++,t:'create',by:'管理员',time:n,desc:`任务创建，预算 ${fm(price)}（${ptlb(pt)}），服务费 ${comm}%，执行人实得 ${fm(net)}`}]});
+  closeM('m-order');
+  clearTags('osa','o-sw','o-si'); // FIX #3
+  ['o-title','o-desc','o-price','o-loc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('o-comm').value='5';
+  document.getElementById('o-prev').style.display='none';
+  toast(`✓ 任务「${title}」已创建`,2500);
+  // FIX #5: guide user to next step
+  setTimeout(()=>toast('💡 前往"智能匹配"为该任务分配执行人',3000),2800);
+  refreshAll();
+}
+
+// match — FIX #7 better empty state, #12 rate comparison
+function renderMatch(){
+  const pending=orders.filter(o=>o.status==='pending');
+  document.getElementById('match-list').innerHTML=pending.length?
+    pending.map(o=>`<div class="oc ${selMatch===o.id?'sel':''}" onclick="runMatch(${o.id},this)">
+      <div class="oh"><div><div class="ot">${o.title}</div><div class="om"><span class="pb">${fm(o.price)}</span><span class="tag tgy">${ptlb(o.pt)}</span></div></div><span class="tag ${pcl(o.pri)}">${plb(o.pri)}</span></div>
+      <div style="margin-top:6px">${o.skills.map(s=>`<span class="sp">${s}</span>`).join('')}</div>
+    </div>`).join(''):
+    '<div class="empty"><div class="ei">◎</div><div class="et">暂无待匹配任务</div></div>';
+  if(selMatch){const o=orders.find(x=>x.id===selMatch);if(o&&o.status==='pending')_matchRes(o);else{selMatch=null;document.getElementById('match-res').innerHTML='<div class="empty"><div class="ei">◎</div><div class="et">请先选择左侧任务</div></div>';}}
+}
+function runMatch(oid,el){
+  selMatch=oid;
+  document.querySelectorAll('#match-list .oc').forEach(c=>c.classList.remove('sel'));
+  if(el)el.classList.add('sel');
+  _matchRes(orders.find(x=>x.id===oid));
+}
+function _matchRes(o){
+  const scored=people.map(p=>({...p,score:calcMatch(p,o)})).sort((a,b)=>b.score-a.score);
+  const good=scored.filter(p=>p.score>0);
+  const comm=o.comm||5,net=o.price?Math.round(o.price*(1-comm/100)):0;
+  const header=`<div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--b)">
+    <div style="font-size:13px;font-weight:600;margin-bottom:6px">${o.title}</div>
+    <div style="display:flex;gap:12px;font-size:12px;flex-wrap:wrap">
+      <span class="pb">${fm(o.price)}</span><span class="tag tgy">${ptlb(o.pt)}</span>
+      <span>实得 <b style="color:var(--tl)">${fm(net)}</b></span><span style="color:var(--t2)">服务费 ${comm}%</span>
+    </div>
+    <div style="margin-top:7px">${o.skills.map(s=>`<span class="sp">${s}</span>`).join('')}</div>
+  </div>`;
+  if(!good.length){
+    // FIX #7: explain why
+    const allS=scored.flatMap(p=>p.skills);
+    const missing=o.skills.filter(sk=>!allS.some(s=>s.toLowerCase().includes(sk.toLowerCase())));
+    document.getElementById('match-res').innerHTML=header+`<div class="wbox">⚠ 未找到匹配人员${missing.length?`，平台暂无掌握 ${missing.map(s=>`<b>${s}</b>`).join('、')} 的人员，建议先在"人员管理"中添加相关人员，或调整任务技能标签。`:'，所有相关人员当前均不空闲。'}</div>`;
+    return;
+  }
+  document.getElementById('match-res').innerHTML=header+good.map(p=>{
+    // FIX #12: daily rate comparison
+    let rateHint='';
+    if(o.pt==='daily'&&p.rate&&o.price){
+      const diff=o.price-p.rate;
+      rateHint=`<span style="font-size:10px;padding:1px 6px;border-radius:10px;${diff>=0?'background:var(--gnb);color:var(--gn)':'background:var(--rdb);color:var(--rd)'}">${diff>=0?'+':''}${fm(diff)}</span>`;
+    }
+    return `<div class="mcr">
+      <div class="av ${avc(p.id)}" style="width:32px;height:32px;font-size:11px;flex-shrink:0">${ini(p.name)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;flex-wrap:wrap">
+          <span style="font-size:13px;font-weight:500">${p.name}</span>
+          <span style="font-size:11px;color:var(--t2)">${p.role}</span>
+          <span class="st ${acl(p.avail)}" style="margin-left:auto;font-size:10px">${alb(p.avail)}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px"><div class="mbb"><div class="mbf" style="width:${p.score}%"></div></div><span class="mp">${p.score}%</span></div>
+        <div style="font-size:11px;color:var(--t2);display:flex;gap:8px;flex-wrap:wrap;align-items:center">${p.rating}⭐ · ${p.orders}单 · ${p.years}年 · 日薪 ${fm(p.rate)} ${rateHint}</div>
+      </div>
+      ${p.avail==='idle'?`<button class="btn btns btnt" onclick="assignOrder(${o.id},${p.id})">派单</button>`:`<button class="btn btns" disabled style="opacity:.35;cursor:not-allowed">不可接</button>`}
+    </div>`;
+  }).join('');
+}
+function assignOrder(oid,pid){
+  const o=orders.find(x=>x.id===oid),p=people.find(x=>x.id===pid);
+  if(!o||!p)return;
+  const n=now(),score=calcMatch(p,o),comm=o.comm||5,net=o.price?Math.round(o.price*(1-comm/100)):0;
+  o.status='matched';o.ass=pid;
+  o.logs.push({id:nLid++,t:'match',by:'系统',time:n,desc:`智能匹配，${p.name} 匹配率 ${score}%`});
+  o.logs.push({id:nLid++,t:'assign',by:'管理员',time:n,desc:`派单给 ${p.name}，执行人实得 ${fm(net)}`});
+  p.avail='busy';selMatch=null;
+  // FIX #1: refresh match list immediately; FIX #5: guide next step
+  toast(`✓ 已派给 ${p.name}，前往"任务管理"点击"开始执行"`,3000);
+  refreshAll();renderMatch();
+}
+
+// handover page
+function renderHandover(){
+  const active=orders.filter(o=>o.status==='inprog'||o.status==='matched');
+  document.getElementById('ho-list').innerHTML=active.length?active.map(o=>{
+    const a=o.ass?people.find(p=>p.id===o.ass):null;
+    return `<div class="oc ${selHo===o.id?'sel':''}" onclick="showHoLog(${o.id},this)">
+      <div class="oh"><div><div class="ot">${o.title}</div><div class="om"><span class="pb">${fm(o.price)}</span>${a?`<span>执行人：${a.name}</span>`:''}</div></div><span class="st s${o.status}">${slb(o.status)}</span></div>
+      <div style="margin-top:6px">${o.skills.map(s=>`<span class="sp">${s}</span>`).join('')}</div>
+      ${o.status==='inprog'?`<div style="margin-top:9px;display:flex;gap:7px">
+        <button class="btn btns" onclick="event.stopPropagation();doProgress(${o.id})">📝 进展</button>
+        <button class="btn btns" onclick="event.stopPropagation();doHandover(${o.id})">申请交接</button>
+        <button class="btn btns btng" onclick="event.stopPropagation();doComplete(${o.id})">✓ 完成</button>
+      </div>`:''}
+    </div>`;
+  }).join(''):'<div class="empty"><div class="ei">⇄</div><div class="et">暂无进行中任务</div></div>';
+  if(selHo){const o=orders.find(x=>x.id===selHo);if(o)showHoLog(selHo,null);else selHo=null;}
+}
+function showHoLog(oid,el){
+  selHo=oid;
+  document.querySelectorAll('#ho-list .oc').forEach(c=>c.classList.remove('sel'));
+  if(el)el.classList.add('sel');
+  const o=orders.find(x=>x.id===oid),a=o.ass?people.find(p=>p.id===o.ass):null,comm=o.comm||5;
+  document.getElementById('ho-log').innerHTML=`
+    <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--b)">
+      <div style="font-size:14px;font-weight:600;margin-bottom:6px">${o.title}</div>
+      <div style="display:flex;gap:14px;font-size:12px;flex-wrap:wrap">
+        <span><b style="color:var(--gn)">${fm(o.price)}</b> ${ptlb(o.pt)}</span>
+        <span>服务费 ${comm}%</span><span>实得 <b style="color:var(--tl)">${fm(o.price?Math.round(o.price*(1-comm/100)):0)}</b></span>
+      </div>
+      ${a?`<div style="display:flex;align-items:center;gap:7px;margin-top:8px"><div class="av ${avc(a.id)}" style="width:18px;height:18px;font-size:7px">${ini(a.name)}</div><span style="font-size:12px">${a.name} · ${a.role}</span></div>`:''}
+    </div>
+    <div style="font-size:10px;font-weight:600;color:var(--t2);margin-bottom:10px;letter-spacing:.04em">留痕时间轴（${o.logs.length}条）</div>
+    ${renderLogs(o.logs)}`;
+}
+
+// action launchers
+function doHandover(oid){
+  hoOid=oid;const o=orders.find(x=>x.id===oid);
+  document.getElementById('ho-info').innerHTML=`<div style="background:var(--bg);border-radius:7px;padding:11px"><div style="font-size:13px;font-weight:500;margin-bottom:3px">${o.title}</div><div style="font-size:11px;color:var(--t2);display:flex;gap:10px"><span class="pb">${fm(o.price)}</span><span>截止 ${o.dl||'—'}</span></div></div>`;
+  const sel=document.getElementById('ho-to');
+  sel.innerHTML='<option value="">系统自动匹配</option>';
+  people.filter(p=>p.id!==o.ass&&p.avail==='idle').forEach(p=>{sel.innerHTML+=`<option value="${p.id}">${p.name}（${p.role}，${p.years}年，日薪${fm(p.rate)}）</option>`;});
+  document.getElementById('ho-prog').value='';
+  openM('m-ho');
+}
+function submitHo(){
+  const o=orders.find(x=>x.id===hoOid);if(!o)return;
+  const toId=document.getElementById('ho-to').value,reason=document.getElementById('ho-reason').value,prog=document.getElementById('ho-prog').value.trim(),n=now();
+  const from=people.find(p=>p.id===o.ass);
+  let to=toId?people.find(p=>p.id===parseInt(toId)):null;
+  if(!to){const sc=people.filter(p=>p.id!==o.ass&&p.avail==='idle').map(p=>({...p,score:calcMatch(p,o)})).sort((a,b)=>b.score-a.score);to=sc[0];}
+  if(!to){toast('⚠ 暂无空闲人员可接手');return;}
+  o.logs.push({id:nLid++,t:'handover',by:from?.name||'系统',time:n,desc:`发起交接，原因：${reason}${prog?'。进展：'+prog:''}`});
+  o.logs.push({id:nLid++,t:'assign',by:'系统',time:n,desc:`交接给 ${to.name}（匹配率 ${calcMatch(to,o)}%）`});
+  // FIX #9: only idle if no other active tasks
+  if(from){const oth=orders.filter(x=>x.id!==o.id&&x.ass===from.id&&(x.status==='inprog'||x.status==='matched'));if(!oth.length)from.avail='idle';}
+  to.avail='busy';o.ass=to.id;
+  risks.push({id:risks.length+100,tp:'info',who:from?.name||'',desc:`「${o.title}」交接 → ${to.name}，原因：${reason}`,time:n,done:true});
+  closeM('m-ho');toast(`✓ 任务已交接给 ${to.name}`);refreshAll();if(selHo===hoOid)showHoLog(hoOid,null);
+}
+
+function doComplete(oid){
+  doneOid=oid;const o=orders.find(x=>x.id===oid),comm=o.comm||5,net=o.price?Math.round(o.price*(1-comm/100)):0;
+  document.getElementById('done-info').innerHTML=`<div class="sbox">完成后自动结算：执行人获得 <b>${fm(net)}</b>，平台服务费 <b>${fm(o.price?Math.round(o.price*comm/100):0)}</b></div><div style="background:var(--bg);border-radius:7px;padding:11px;font-size:13px;font-weight:500">${o.title}</div>`;
+  document.getElementById('done-desc').value='';openM('m-done');
+}
+function submitDone(){
+  const o=orders.find(x=>x.id===doneOid);if(!o)return;
+  const desc=document.getElementById('done-desc').value.trim();
+  if(!desc){toast('⚠ 请填写完成说明');return;}
+  const rating=parseInt(document.getElementById('done-rating').value),comm=o.comm||5,net=o.price?Math.round(o.price*(1-comm/100)):0;
+  const a=people.find(p=>p.id===o.ass),n=now();
+  o.status='done';
+  o.logs.push({id:nLid++,t:'complete',by:a?.name||'执行人',time:n,desc:`提交完成：${desc}`});
+  o.logs.push({id:nLid++,t:'verify',by:'管理员',time:n,desc:`验收通过 ${'⭐'.repeat(rating)} ${rating}.0分 · 结算 ${fm(net)}（服务费 ${fm(o.price-net)}）`});
+  if(a){
+    a.rating=Math.round(((a.rating*a.orders+rating)/(a.orders+1))*10)/10;
+    a.orders++;a.earn=(a.earn||0)+net;
+    // FIX #9: only idle if no other active tasks
+    const oth=orders.filter(x=>x.id!==o.id&&x.ass===a.id&&(x.status==='inprog'||x.status==='matched'));
+    if(!oth.length)a.avail='idle';
+  }
+  closeM('m-done');
+  // FIX #11: guide to finance tab
+  toast(`✓ ${a?.name||''}获得 ${fm(net)} · 前往"后台运营→财务统计"查看`,4000);
+  refreshAll();if(selHo===doneOid){selHo=null;document.getElementById('ho-log').innerHTML='<div class="empty"><div class="ei">✓</div><div class="et">任务已完成</div></div>';}
+}
+
+function doProgress(oid){
+  progOid=oid;const o=orders.find(x=>x.id===oid),a=o.ass?people.find(p=>p.id===o.ass):null;
+  document.getElementById('prog-info').innerHTML=`<div style="background:var(--bg);border-radius:7px;padding:11px"><div style="font-size:13px;font-weight:500">${o.title}</div>${a?`<div style="font-size:11px;color:var(--t2);margin-top:3px">执行人：${a.name}</div>`:''}</div>`;
+  document.getElementById('prog-desc').value='';openM('m-prog');
+}
+function submitProg(){
+  const o=orders.find(x=>x.id===progOid);if(!o)return;
+  const desc=document.getElementById('prog-desc').value.trim();
+  if(!desc){toast('⚠ 请填写进展说明');return;}
+  const a=people.find(p=>p.id===o.ass);
+  o.logs.push({id:nLid++,t:'progress',by:a?.name||'执行人',time:now(),desc});
+  closeM('m-prog');toast('✓ 进展已记录');refreshAll();if(selHo===progOid)showHoLog(progOid,null);
+}
+
+// people — FIX #13 search
+function renderPeople(){
+  const q=(document.getElementById('psearch')?.value||'').toLowerCase().trim();
+  let list=q?people.filter(p=>p.name.includes(q)||p.role.toLowerCase().includes(q)||p.skills.some(s=>s.toLowerCase().includes(q))):people;
+  const cnt=document.getElementById('pcnt');if(cnt)cnt.textContent=list.length?`共 ${list.length} 人`:'';
+  document.getElementById('p-list').innerHTML=list.length?list.map(p=>`
+    <div class="prow">
+      <div class="av ${avc(p.id)}" style="width:36px;height:36px;font-size:13px">${ini(p.name)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:500;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          ${p.name}<span style="font-size:11px;color:var(--t2);font-weight:400">${p.role}</span>${p.cert?'<span class="tag ttl" style="font-size:10px">已认证</span>':''}
+        </div>
+        <div style="font-size:11px;color:var(--t2);margin-top:2px;display:flex;gap:9px;flex-wrap:wrap">
+          <span>${p.area}</span><span>${p.years}年</span><span>${p.rating}⭐</span><span>${p.orders}单</span>
+          <span class="pb" style="font-size:11px">日薪 ${fm(p.rate)}</span>
+          ${p.earn?`<span style="color:var(--gn);font-weight:500">已结算 ${fm(p.earn)}</span>`:''}
+        </div>
+        <div style="margin-top:5px;display:flex;flex-wrap:wrap;gap:3px">${p.skills.map(s=>`<span class="sp">${s}</span>`).join('')}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0">
+        <span class="st ${acl(p.avail)}">${alb(p.avail)}</span>
+        <select class="btn btns" onchange="chgStatus(${p.id},this.value)" style="padding:4px 7px;font-size:11px">
+          <option value="idle" ${p.avail==='idle'?'selected':''}>空闲</option>
+          <option value="busy" ${p.avail==='busy'?'selected':''}>忙碌</option>
+          <option value="pause" ${p.avail==='pause'?'selected':''}>暂停</option>
+        </select>
+        <button class="btn btns btnd" onclick="delPerson(${p.id})">移除</button>
+      </div>
+    </div>`).join(''):'<div class="empty"><div class="et">暂无匹配人员</div></div>';
+  const dist={};people.forEach(p=>p.skills.forEach(s=>{dist[s]=(dist[s]||0)+1;}));
+  const sorted=Object.entries(dist).sort((a,b)=>b[1]-a[1]).slice(0,10),mx=sorted[0]?.[1]||1;
+  document.getElementById('skill-dist').innerHTML=sorted.map(([s,c])=>`
+    <div style="display:flex;align-items:center;gap:9px;margin-bottom:8px">
+      <div style="font-size:12px;min-width:75px;color:var(--t2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s}</div>
+      <div style="flex:1;height:5px;background:var(--gb);border-radius:3px;overflow:hidden"><div style="height:5px;border-radius:3px;background:var(--bl);width:${(c/mx)*100}%"></div></div>
+      <div style="font-size:12px;font-weight:600;min-width:14px;text-align:right">${c}</div>
+    </div>`).join('');
+}
+function chgStatus(pid,val){const p=people.find(x=>x.id===pid);if(p){p.avail=val;toast(`${p.name} → ${alb(val)}`);renderPeople();}}
+function delPerson(pid){
+  if(!confirm('确认移除该人员？相关进行中任务将重置为待匹配。'))return;
+  orders.forEach(o=>{if(o.ass===pid&&(o.status==='inprog'||o.status==='matched')){o.ass=null;o.status='pending';o.logs.push({id:nLid++,t:'close',by:'系统',time:now(),desc:'执行人被移除，任务重置为待匹配'});}});
+  people=people.filter(p=>p.id!==pid);toast('人员已移除');renderPeople();refreshAll();
+}
+function submitPerson(){
+  const name=document.getElementById('p-name').value.trim();if(!name){toast('⚠ 请输入姓名');return;}
+  const extra=document.getElementById('p-si').value.trim(),skls=[...(tags['psa']||[])];if(extra)skls.push(extra);
+  people.push({id:nPid++,name,role:document.getElementById('p-role').value.trim()||'服务人员',contact:document.getElementById('p-contact').value.trim(),area:document.getElementById('p-area').value.trim()||'未知',avail:document.getElementById('p-avail').value,skills:skls,years:parseInt(document.getElementById('p-years').value)||0,rate:parseFloat(document.getElementById('p-rate').value)||0,rating:5.0,orders:0,cert:false,earn:0});
+  closeM('m-person');clearTags('psa','p-sw','p-si');
+  ['p-name','p-role','p-contact','p-area','p-rate'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  toast(`✓ 人员「${name}」已添加`);renderPeople();refreshAll();
+}
+
+// skills
+function renderSkills(){
+  const cats=[...new Set(skills.map(s=>s.cat))];
+  document.getElementById('sk-cats').innerHTML=cats.map(c=>`
+    <div style="padding:9px 14px;border-bottom:1px solid var(--b);cursor:pointer;font-size:13px;color:${selSkCat===c?'var(--bl)':'var(--t2)'};font-weight:${selSkCat===c?'600':'400'}" onclick="selSkCat='${c}';renderSkills()">
+      ${c}<span style="float:right;font-size:11px;background:var(--gb);padding:1px 6px;border-radius:10px">${skills.filter(s=>s.cat===c).length}</span>
+    </div>`).join('')+`<div style="padding:9px 14px;cursor:pointer;font-size:13px;color:${selSkCat===null?'var(--bl)':'var(--t2)'};font-weight:${selSkCat===null?'600':'400'}" onclick="selSkCat=null;renderSkills()">全部<span style="float:right;font-size:11px;background:var(--gb);padding:1px 6px;border-radius:10px">${skills.length}</span></div>`;
+  const f=selSkCat?skills.filter(s=>s.cat===selSkCat):skills;
+  document.getElementById('sk-table').innerHTML=`<table><thead><tr><th>标签</th><th>分类</th><th>同义词</th><th>使用人数</th><th>操作</th></tr></thead><tbody>
+    ${f.map(s=>`<tr><td><span class="sp">${s.n}</span></td><td><span class="tag tgy">${s.cat}</span></td><td style="font-size:11px;color:var(--t2)">${s.alias.join(', ')||'—'}</td><td style="font-weight:500">${s.cnt}</td><td><button class="btn btns btnd" onclick="delSkill(${s.id})">删除</button></td></tr>`).join('')}
+  </tbody></table>`;
+}
+function delSkill(id){if(!confirm('确认删除？'))return;skills=skills.filter(s=>s.id!==id);toast('已删除');renderSkills();}
+function submitSkill(){
+  const name=document.getElementById('sk-n').value.trim();if(!name){toast('⚠ 请输入标签名称');return;}
+  if(skills.find(s=>s.n.toLowerCase()===name.toLowerCase())){toast('该标签已存在');return;}
+  skills.push({id:skills.length+200,n:name,cat:document.getElementById('sk-c').value,alias:document.getElementById('sk-a').value.split(',').map(s=>s.trim()).filter(Boolean),cnt:0});
+  closeM('m-skill');['sk-n','sk-a'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  toast(`✓「${name}」已添加`);renderSkills();
+}
+
+// admin
+function renderAdmin(){renderAdminTab('overview');}
+function switchATab(tab,el){
+  document.querySelectorAll('#atbar .ti').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('#pg-admin .tp').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');document.getElementById('at-'+tab).classList.add('on');
+  curATab=tab;renderAdminTab(tab);
+}
+function renderAdminTab(tab){
+  if(tab==='overview'){
+    const done=orders.filter(o=>o.status==='done');
+    const gmv=done.reduce((s,o)=>s+(o.price||0),0),fee=done.reduce((s,o)=>s+Math.round((o.price||0)*(o.comm||5)/100),0);
+    document.getElementById('at-overview').innerHTML=`
+      <div class="g4" style="margin-bottom:18px">
+        <div class="mc"><div class="mv">${orders.length}</div><div class="ml">总任务数</div></div>
+        <div class="mc"><div class="mv">${done.length}</div><div class="ml">已完成</div></div>
+        <div class="mc"><div class="mv" style="font-size:18px;color:var(--gn)">${fm(gmv)}</div><div class="ml">已结算 GMV</div></div>
+        <div class="mc"><div class="mv" style="font-size:18px">${fm(fee)}</div><div class="ml">平台服务费收入</div></div>
+      </div>
+      <div class="g2">
+        <div class="card cp"><div class="stl" style="margin-top:0">人效排行</div>${[...people].sort((a,b)=>b.orders-a.orders).slice(0,5).map((p,i)=>`<div class="sr"><div style="display:flex;align-items:center;gap:7px"><span style="font-size:11px;color:var(--t3);min-width:14px">${i+1}</span><div class="av ${avc(p.id)}" style="width:18px;height:18px;font-size:8px">${ini(p.name)}</div><span class="sl">${p.name}</span></div><span class="sv">${p.orders}单 · ${p.rating}⭐</span></div>`).join('')}</div>
+        <div class="card cp"><div class="stl" style="margin-top:0">技能需求 Top5</div>${[...skills].sort((a,b)=>b.cnt-a.cnt).slice(0,5).map((s,i)=>`<div class="sr"><span class="sl">${i+1}. ${s.n}</span><span class="sp">${s.cat}</span></div>`).join('')}</div>
+      </div>`;
+  } else if(tab==='finance'){
+    const done=orders.filter(o=>o.status==='done');
+    const tGmv=done.reduce((s,o)=>s+(o.price||0),0),tFee=done.reduce((s,o)=>s+Math.round((o.price||0)*(o.comm||5)/100),0);
+    document.getElementById('at-finance').innerHTML=`
+      <div class="g3" style="margin-bottom:18px">
+        <div class="mc"><div class="mv" style="color:var(--gn);font-size:20px">${fm(tGmv)}</div><div class="ml">累计 GMV</div></div>
+        <div class="mc"><div class="mv" style="font-size:20px">${fm(tFee)}</div><div class="ml">平台服务费</div></div>
+        <div class="mc"><div class="mv" style="font-size:20px;color:var(--tl)">${fm(tGmv-tFee)}</div><div class="ml">已结算给执行人</div></div>
+      </div>
+      <div class="card" style="margin-bottom:14px"><table>
+        <thead><tr><th>任务</th><th>计价</th><th>预算</th><th>服务费率</th><th>平台收入</th><th>执行人实得</th><th>执行人</th></tr></thead>
+        <tbody>${done.map(o=>{const a=o.ass?people.find(p=>p.id===o.ass):null,comm=o.comm||5,fee=Math.round((o.price||0)*comm/100),net=(o.price||0)-fee;
+          return `<tr><td style="font-weight:500">${o.title}</td><td><span class="tag tgy">${ptlb(o.pt)}</span></td><td style="color:var(--gn);font-weight:600">${fm(o.price)}</td><td>${comm}%</td><td style="font-weight:500">${fm(fee)}</td><td style="color:var(--tl);font-weight:600">${fm(net)}</td><td>${a?`<div style="display:flex;align-items:center;gap:5px"><div class="av ${avc(a.id)}" style="width:14px;height:14px;font-size:6px">${ini(a.name)}</div>${a.name}</div>`:'—'}</td></tr>`;
+        }).join('')}</tbody></table></div>
+      <div class="card cp"><div class="stl" style="margin-top:0">执行人累计结算</div>${[...people].filter(p=>p.earn>0).sort((a,b)=>b.earn-a.earn).map(p=>`<div class="sr"><div style="display:flex;align-items:center;gap:7px"><div class="av ${avc(p.id)}" style="width:18px;height:18px;font-size:7px">${ini(p.name)}</div><span class="sl">${p.name}</span></div><span class="sv" style="color:var(--tl)">${fm(p.earn)}</span></div>`).join('')||'<div style="color:var(--t3);font-size:13px;padding:6px 0">暂无结算记录</div>'}</div>`;
+  } else if(tab==='risk'){
+    document.getElementById('at-risk').innerHTML=`<div class="card">${risks.map(r=>`
+      <div style="display:flex;gap:11px;padding:13px 16px;border-bottom:1px solid var(--b)">
+        <div style="flex:1"><div style="display:flex;align-items:center;gap:7px;margin-bottom:4px;flex-wrap:wrap"><span class="tag ${r.tp==='warn'?'tam':'tbl'}">${r.tp==='warn'?'⚠ 风控告警':'ℹ 系统通知'}</span><span style="font-size:11px;color:var(--t3)">${r.time}</span><span class="tag ${r.done?'ttl':'trd'}" style="margin-left:auto">${r.done?'已处理':'待处理'}</span></div><div style="font-size:13px">${r.who?`<b>${r.who}</b>：`:''}${r.desc}</div></div>
+        ${!r.done?`<button class="btn btns btnt" style="flex-shrink:0;align-self:center" onclick="solveRisk(${r.id})">标记处理</button>`:''}
+      </div>`).join('')}${!risks.length?'<div class="empty"><div class="et">暂无风控记录</div></div>':''}</div>`;
+  } else if(tab==='roles'){
+    const roles=[{n:'超级管理员',p:['人员审核','标签管理','订单干预','财务统计','系统配置']},{n:'运营管理员',p:['人员审核','标签管理','订单干预','财务统计']},{n:'调度员',p:['订单干预']},{n:'数据分析员',p:['财务统计']}];
+    const ap=['人员审核','标签管理','订单干预','财务统计','系统配置'];
+    document.getElementById('at-roles').innerHTML=`<div class="card"><table><thead><tr><th>角色</th>${ap.map(p=>`<th>${p}</th>`).join('')}</tr></thead><tbody>${roles.map(r=>`<tr><td style="font-weight:500">${r.n}</td>${ap.map(p=>`<td>${r.p.includes(p)?'<span style="color:var(--tl);font-size:15px">✓</span>':'<span style="color:var(--bm)">—</span>'}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  }
+}
+function solveRisk(id){const r=risks.find(x=>x.id===id);if(r){r.done=true;toast('已标记处理');renderAdminTab('risk');}}
+
+// init
+document.getElementById('dash-date').textContent=new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
+updBadges();renderDash();
+</script>
+</body>
+</html>
